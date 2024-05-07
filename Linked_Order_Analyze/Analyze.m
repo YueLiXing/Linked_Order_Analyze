@@ -26,7 +26,7 @@ static NSString * const LINKED_MAP = @"linked_map.txt";
 // order 文件名
 static NSString * const LB_ORDER = @"lb.order";
 // iOS平台虚拟内存页大小(16k)
-static unsigned long long const VM_PAGE_SIZE = 16 * 1024;
+static unsigned long long const VM_PAGE_SIZE_LINK = 16 * 1024;
 
 // 链接文件 __Text 映射字典 key:symbol value:[起始地址, 占用内存大小]
 static NSMutableDictionary<NSString *, NSArray<NSNumber *> *> *linkedTextDictM;
@@ -83,7 +83,7 @@ static double const PAGE_FAULT_CONST_ESTIMATE_TIME = 0.5;
         
         // 分析分配的虚拟内存页个数
         unsigned long long section_text_decimal_size = [Util decimalFromHexStr:sectionTextSizeHexStr];
-        sectionTextLinkedVMPageCount = section_text_decimal_size / VM_PAGE_SIZE + 1;
+        sectionTextLinkedVMPageCount = section_text_decimal_size / VM_PAGE_SIZE_LINK + 1;
         
         NSLog(@"----linked __text vm count:%llu", sectionTextLinkedVMPageCount);
         
@@ -164,7 +164,7 @@ static double const PAGE_FAULT_CONST_ESTIMATE_TIME = 0.5;
     __block unsigned long long orderSymbolLineCount = 0;
     // order 中symbol所占用内存页分布情况
     __block NSMutableSet<NSNumber *> *orderVMPageSetM = [NSMutableSet set];
-    // order 中 所有 symbol 占用大小总和，除以 VM_PAGE_SIZE 可以得到排序后占用的连续虚拟内页个数
+    // order 中 所有 symbol 占用大小总和，除以 VM_PAGE_SIZE_LINK 可以得到排序后占用的连续虚拟内页个数
     __block unsigned long long orderSumAllSymbolSize = 0;
     // order 中 未命中 section __Text 的symbol集合
     __block NSMutableArray<NSString *> *orderUntargetSymbolsArrM = [NSMutableArray array];
@@ -209,7 +209,7 @@ static double const PAGE_FAULT_CONST_ESTIMATE_TIME = 0.5;
         }
         unsigned long long orderSymbolRelativeStartAddressDecimalValue = orderSymbolStartAddressDecimalValue - sectionTextStartAddressDecimalValue;
         // 得到当前 symbole 所在的内存页序号index
-        unsigned long long orderSymbolVMPageIndex = orderSymbolRelativeStartAddressDecimalValue / VM_PAGE_SIZE;
+        unsigned long long orderSymbolVMPageIndex = orderSymbolRelativeStartAddressDecimalValue / VM_PAGE_SIZE_LINK;
         [orderVMPageSetM addObject:@(orderSymbolVMPageIndex)]; // 得到被分配到了哪些虚拟内存页
         
         // 获得 symbole 十进制 的占用内存大小
@@ -218,7 +218,7 @@ static double const PAGE_FAULT_CONST_ESTIMATE_TIME = 0.5;
     }];
     
     // 6. 将 order文件中所包含的symbol内存占用相加，分析得到 重排后所占虚拟内存页个数
-    unsigned long long orderSymbolAllVMPageCount = orderSumAllSymbolSize / VM_PAGE_SIZE + 1;
+    unsigned long long orderSymbolAllVMPageCount = orderSumAllSymbolSize / VM_PAGE_SIZE_LINK + 1;
     if (orderSymbolAllVMPageCount > orderVMPageSetM.count) orderSymbolAllVMPageCount = orderVMPageSetM.count;
     
     printf("\n---> 分析结果：");
