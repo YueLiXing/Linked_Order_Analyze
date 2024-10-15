@@ -41,14 +41,23 @@ static NSString * const BASE_PATH = @"/Users/liyang/Desktop/1";
 
 ### 如何编译出 lb.order 文件
 
-1. 在目标工程 __Target -> Build Settings -> Other C Flags__ 添加 __-fsanitize-coverage=func,trace-pc-guard__。
+1. 在目标工程 __Target -> Build Settings -> Other C Flags__ 添加
 
-    如果有swfit代码，也要在 __Other Swift Flags__ 添加 __-sanitize-coverage=func__ 和__-sanitize=undefined__
+```
+-fsanitize-coverage=func,trace-pc-guard
+```
+
+    如果有swfit代码，也要在 __Other Swift Flags__ 添加
+   
+```
+-sanitize-coverage=func
+-sanitize=undefined
+```
     
     (如果有源码编译的Framework也要添加这些配置。CocoaPods引入的第三方库不建议添加此配置）
 
-2. 将 __MMTracePCGuard__ 文件放入到目标工程
-3. 将 __+[MMTracePCGuard analyze]__ 方法放到目标工程认为可以启动结束的位置调用，执行 __clean->build->run__。根据自身工程复杂度的情况，等待几分钟或者十几分钟，就会在沙盒 Documents 的 temp 目录生成 lb.order 文件
+4. 将 __MMTracePCGuard__ 文件放入到目标工程
+5. 将 __+[MMTracePCGuard analyze]__ 方法放到目标工程认为可以启动结束的位置调用，执行 __clean->build->run__。根据自身工程复杂度的情况，等待几分钟或者十几分钟，就会在沙盒 Documents 的 temp 目录生成 lb.order 文件
 
 
 ---
